@@ -1,0 +1,7 @@
+openpyxl>=3.1.0
+pandas>=2.0.0
+
+# Para sesiones futuras:
+# plotly>=5.18.0
+# dash>=2.14.0
+# python-dateutil>=2.8.2
