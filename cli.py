@@ -2,12 +2,14 @@
 CLI SLEP Petorca — Sistema de Gestión Financiera
 
 Uso:
-    python cli.py update   [--raw PATH] [--fecha-corte YYYY-MM-DD]
+    python cli.py update    [--raw PATH] [--fecha-corte YYYY-MM-DD]
     python cli.py status
     python cli.py conciliar
     python cli.py disponible
     python cli.py flujo
+    python cli.py dashboard [--output PATH]
     python cli.py saldo --cuenta ID --monto MONTO [--fecha YYYY-MM-DD]
+    python cli.py saldo-lote --archivo PATH [--fecha YYYY-MM-DD]
 """
 import argparse
 import sqlite3
@@ -54,6 +56,23 @@ def cmd_flujo(args):
     """Flujo de caja histórico y proyección mensual."""
     from analytics.flujo_caja import imprimir
     imprimir(Path(args.db))
+
+
+def cmd_dashboard(args):
+    """Genera el dashboard HTML en reports/output/dashboard.html."""
+    import subprocess, sys as _sys
+    from reports.dashboard import generar
+    out = Path(args.output) if args.output else None
+    kwargs = {"db_path": Path(args.db)}
+    if out:
+        kwargs["output"] = out
+    ruta = generar(**kwargs)
+    # Intentar abrir en el navegador
+    try:
+        import webbrowser
+        webbrowser.open(ruta.as_uri())
+    except Exception:
+        pass
 
 
 def cmd_saldo(args):
@@ -190,6 +209,10 @@ def main():
     # flujo
     sub.add_parser("flujo", help="Flujo de caja histórico y proyección")
 
+    # dashboard
+    p_dash = sub.add_parser("dashboard", help="Genera dashboard HTML (abre en navegador)")
+    p_dash.add_argument("--output", default=None, help="Ruta de salida (default: reports/output/dashboard.html)")
+
     # saldo
     p_saldo = sub.add_parser("saldo", help="Registra saldo bancario de una cuenta")
     p_saldo.add_argument("--cuenta", required=True, help="ID de cuenta (3 dígitos, ej. 341)")
@@ -209,6 +232,7 @@ def main():
         "conciliar":  cmd_conciliar,
         "disponible": cmd_disponible,
         "flujo":      cmd_flujo,
+        "dashboard":  cmd_dashboard,
         "saldo":      cmd_saldo,
         "saldo-lote": cmd_saldo_lote,
     }

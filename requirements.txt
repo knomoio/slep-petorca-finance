@@ -1,7 +1,10 @@
 openpyxl>=3.1.0
 pandas>=2.0.0
 
-# Para sesiones futuras:
+# Dashboard HTML — Chart.js se carga desde CDN, no requiere instalación local.
+# El comando `python cli.py dashboard` genera un HTML autocontenido.
+
+# Opcional para análisis avanzado en el futuro:
 # plotly>=5.18.0
 # dash>=2.14.0
 # python-dateutil>=2.8.2
